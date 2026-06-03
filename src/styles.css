@@ -1,0 +1,97 @@
+:root {
+  --paper: #f6f4ef;
+  --ink: #1d2433;
+  --navy: #15155a;
+  --muted: #6b6f7a;
+  --line: #e4e0d7;
+  --white: #fff;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+
+.container { max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.25rem; }
+
+/* 마스트헤드 */
+.masthead { border-bottom: 1px solid var(--line); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+.kicker { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.h1 { font-size: 1.9rem; font-weight: 800; line-height: 1.15; margin: 0.25rem 0 0; }
+.sub { font-size: 0.875rem; color: var(--muted); margin: 0.4rem 0 0; }
+
+/* 툴바 */
+.toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 1rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;
+  border-radius: 0.4rem; padding: 0.4rem 0.75rem; font-size: 13px; font-weight: 600;
+  border: 1px solid var(--line); background: var(--white); color: var(--ink);
+  transition: background 0.15s, opacity 0.15s; font-family: inherit;
+}
+.btn:hover { background: #fafafa; }
+.btn-primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+.btn-primary:hover { opacity: 0.9; background: var(--navy); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.badge {
+  border-radius: 0.4rem; padding: 0.25rem 0.5rem; font-size: 11px; font-weight: 600;
+  background: #fff; border: 1px solid var(--line); color: var(--muted);
+}
+.badge.live { color: #1f7a44; }
+
+.note { margin-top: 0.75rem; border-radius: 0.4rem; padding: 0.5rem 0.75rem; font-size: 12.5px; }
+.note.warn { background: #fff7e8; color: #8a5a00; border: 1px solid #f0e2c2; }
+
+/* 섹션 */
+.section { margin-bottom: 2rem; }
+.section-title { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--navy); margin: 0; }
+.section-sub { font-size: 12px; color: var(--muted); margin: 0.15rem 0 0.75rem; }
+
+/* 카드 */
+.grid { display: grid; gap: 1rem; }
+.card { border: 1px solid var(--line); background: var(--white); border-radius: 0.6rem; padding: 1.25rem; transition: box-shadow 0.15s; }
+.card:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.card-top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.tag { display: inline-flex; align-items: center; gap: 0.25rem; border-radius: 999px; padding: 0.1rem 0.5rem; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.tag.pick { background: #eef0ff; color: var(--navy); }
+.tag.hot { background: #fdeee0; color: #9a5a00; }
+.meta { font-size: 11px; color: var(--muted); }
+.title-link { display: inline-flex; align-items: flex-start; gap: 0.35rem; text-decoration: none; }
+.title { font-size: 1.06rem; font-weight: 700; line-height: 1.35; margin: 0; }
+.title-link:hover .title { text-decoration: underline; }
+.ext { opacity: 0.4; flex-shrink: 0; margin-top: 0.2rem; }
+.bullets { list-style: none; margin: 0.6rem 0 0; padding: 0; }
+.bullets li { display: flex; gap: 0.5rem; font-size: 13.5px; line-height: 1.55; color: #41464f; margin-bottom: 0.35rem; }
+.dot { width: 4px; height: 4px; border-radius: 999px; background: var(--navy); flex-shrink: 0; margin-top: 0.6rem; }
+
+.card-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 0.75rem; }
+.ask { font-size: 11px; color: var(--muted); }
+
+.like-btn {
+  display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-family: inherit;
+  border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--muted);
+  padding: 0.35rem 0.85rem; font-size: 13px; font-weight: 600; transition: transform 0.1s, background 0.15s;
+}
+.like-btn:hover { transform: scale(1.03); }
+.like-btn:active { transform: scale(0.96); }
+.like-btn.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* 스켈레톤 */
+.sk { border: 1px solid var(--line); background: #fff; border-radius: 0.6rem; padding: 1.25rem; }
+.sk-line { height: 0.9rem; border-radius: 0.25rem; background: #ece8e0; animation: pulse 1.4s ease-in-out infinite; margin-bottom: 0.5rem; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* 푸터 */
+.footer { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1.25rem; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.footer a { color: var(--navy); }
+
+/* 토스트 */
+.toast {
+  position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: #fff; border-radius: 999px; padding: 0.5rem 1rem;
+  font-size: 13px; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); z-index: 50;
+}
