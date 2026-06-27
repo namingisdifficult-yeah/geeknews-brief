@@ -16,6 +16,7 @@ const ExtLink = (p) => <Icon {...p} size={14} d={<><path d="M15 3h6v6" /><path d
 const Heart = (p) => <Icon {...p} size={11} fill="currentColor" d={<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />} />;
 const Flame = (p) => <Icon {...p} size={11} fill="currentColor" d={<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.85-4.24 1-6 .25 2.5 1.5 3.5 3 4.5 2 1.5 3 3 3 5a6 6 0 1 1-12 0c0-1.5.5-3 2.5-4.5-.5 1.5-.5 2.5 0 3.5Z" />} />;
 const Check = (p) => <Icon {...p} size={13} d={<path d="M20 6 9 17l-5-5" />} />;
+const Bulb = (p) => <Icon {...p} size={12} d={<><path d="M9 18h6" /><path d="M10 22h4" /><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5" /></>} />;
 
 function LikeButton({ liked, onToggle }) {
   return (
@@ -44,6 +45,12 @@ function Card({ article, liked, onToggle }) {
           <li key={i}><span className="dot" /><span>{b}</span></li>
         ))}
       </ul>
+      {article.insight && (
+        <div className="insight">
+          <span className="insight-label"><Bulb /> 왜 중요한가</span>
+          <p className="insight-text">{article.insight}</p>
+        </div>
+      )}
       <div className="card-foot">
         <span className="ask">이 글, 마음에 드나요?</span>
         <LikeButton liked={liked} onToggle={() => onToggle(article)} />
@@ -183,6 +190,7 @@ export default function App() {
         </p>
         <p style={{ marginTop: "0.4rem" }}>
           ‘화제성(▲·댓글)’은 원문 조회수·SNS 공유수를 직접 알 수 없어 GeekNews 추천수·댓글수로 추정한 근사치입니다. 데이터는 매일 자동으로 갱신됩니다.
+          ‘왜 중요한가’ 인사이트는 Gemini가 자동 생성한 참고용 해설로, 사실과 다를 수 있습니다.
         </p>
       </footer>
 

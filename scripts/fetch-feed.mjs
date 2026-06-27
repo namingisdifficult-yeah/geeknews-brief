@@ -5,6 +5,7 @@
 //   3) 그래도 실패하면 내장 스냅샷으로 폴백 → 빌드는 절대 깨지지 않음
 import { writeFileSync, mkdirSync } from "node:fs";
 import { parseFeed, parseStats } from "./parse.mjs";
+import { addInsights } from "./insight.mjs";
 import { SNAPSHOT } from "../src/snapshot.js";
 
 const BROWSER_HEADERS = {
@@ -59,6 +60,13 @@ async function main() {
     console.warn("\uc2e4\uc2dc\uac04 \uc218\uc9d1 \uc2e4\ud328 \u2192 \uc2a4\ub0c5\uc0f7 \uc0ac\uc6a9:", e.message);
     items = SNAPSHOT;
     live = false;
+  }
+
+  // "이게 왜 중요한지" 인사이트 생성(Gemini 무료 티어). 키 없으면 조용히 건너뜀.
+  try {
+    await addInsights(items);
+  } catch (e) {
+    console.warn("인사이트 생성 단계 예외(무시):", e.message);
   }
 
   mkdirSync("public", { recursive: true });

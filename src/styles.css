@@ -68,6 +68,11 @@ a { color: inherit; }
 .bullets li { display: flex; gap: 0.5rem; font-size: 13.5px; line-height: 1.55; color: #41464f; margin-bottom: 0.35rem; }
 .dot { width: 4px; height: 4px; border-radius: 999px; background: var(--navy); flex-shrink: 0; margin-top: 0.6rem; }
 
+/* 인사이트 — "이게 왜 중요한가" (요약과 구분되는 강조 블록) */
+.insight { margin-top: 0.85rem; background: #eef0ff; border: 1px solid #dde1ff; border-radius: 0.5rem; padding: 0.65rem 0.8rem; }
+.insight-label { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); }
+.insight-text { margin: 0.3rem 0 0; font-size: 13px; line-height: 1.55; color: #33375a; }
+
 .card-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 0.75rem; }
 .ask { font-size: 11px; color: var(--muted); }
 

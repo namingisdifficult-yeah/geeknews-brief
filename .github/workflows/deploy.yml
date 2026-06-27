@@ -26,6 +26,10 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run build
+        env:
+          # Google AI Studio 무료 키. 저장소 Settings → Secrets and variables → Actions 에 등록.
+          # 없으면 인사이트만 생략되고 나머지 기능은 그대로 동작.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

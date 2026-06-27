@@ -64,6 +64,7 @@ export function normalize(raw, i = 0) {
     comments: Number(raw.comments) || 0,
     bullets: raw.bullets && raw.bullets.length ? raw.bullets.slice(0, 3) : summary ? [summary] : [],
     summary,
+    insight: (raw.insight || "").trim(),
     tokens: tokenize((raw.title || "") + " " + summary),
   };
 }
