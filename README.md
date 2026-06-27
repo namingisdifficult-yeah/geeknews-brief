@@ -5,6 +5,7 @@ GeekNews(news.hada.io)의 최근 기사를 **내 관심사 + 좋아요**로 매�
 
 - **맞춤 3** — 빅테크·AI 전략 / 현업 경험담 / 통신·미디어 관심사 + 좋아요 학습
 - **지금 화제 2** — 취향과 무관하게 추천수(▲)·댓글이 많은 글
+- **왜 중요한가(인사이트)** — 요약을 옮기는 게 아니라 "이게 왜 중요한지"를 한두 문장으로 풀어줌 (Gemini 무료 API)
 - **좋아요** — 이 기기(브라우저)에 저장, 로그인 불필요
 - **매일 자동 갱신** — GitHub Actions가 매일 새벽 GeekNews를 받아 데이터 파일을 새로 만듦
 
@@ -58,6 +59,27 @@ npm run dev     # http://localhost:5173/geeknews-brief/
 ```
 
 `npm run build` → `dist/`(배포본) 생성.
+
+---
+
+## 인사이트(왜 중요한가) — Gemini 무료 API 연결
+
+각 기사 카드에 요약과 별개로 **"이게 왜 중요한지"**를 한두 문장으로 풀어주는 인사이트가 붙습니다.
+빌드(매일 예약 실행) 시점에 **Gemini(Google AI Studio) 무료 티어**로 풀 전체 기사에 대해 **한 번의 요청**으로 생성합니다.
+(5개 선정은 브라우저에서 좋아요 기반으로 달라지므로, 풀 전체에 미리 붙여 두면 어떤 5개가 뽑혀도 인사이트가 항상 표시됩니다.)
+
+**키 발급 (무료, Google 계정만 필요):**
+
+1. [Google AI Studio → Get API key](https://aistudio.google.com/apikey) 에서 키를 만듭니다. (무료 티어, 카드 등록 불필요)
+2. 저장소 **Settings → Secrets and variables → Actions → New repository secret** 클릭.
+3. 이름을 **`GEMINI_API_KEY`**, 값을 발급받은 키로 저장.
+4. **Actions 탭 → Run workflow**(또는 다음 예약 실행)로 다시 빌드하면 인사이트가 생성됩니다.
+
+- **키가 없어도** 앱은 정상 동작합니다 — 인사이트만 생략되고(또는 내장 스냅샷의 기본 인사이트 표시) 나머지는 그대로입니다.
+- **모델 변경**: `GEMINI_MODEL` 환경변수(기본 `gemini-2.5-flash`, 무료 대안 `gemini-2.0-flash`).
+- **로컬에서 시험**: `GEMINI_API_KEY=...내키... npm run fetch` → `public/feed.json`의 각 항목에 `insight`가 채워집니다.
+
+> 무료 티어는 분당 요청수(RPM) 제한이 있지만, 이 앱은 하루 1회·1요청만 보내므로 넉넉합니다.
 
 ---
 
