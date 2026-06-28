@@ -55,7 +55,8 @@ export async function addInsights(items) {
   if (!items || !items.length) return 0;
 
   const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-  const url = `${ENDPOINT}/v1beta/models/${model}:generateContent?key=${key}`;
+  // 키는 쿼리스트링(?key=) 대신 헤더로 전달 → URL/로그/프록시 기록에 키가 남지 않음(Google 권장).
+  const url = `${ENDPOINT}/v1beta/models/${model}:generateContent`;
   const body = {
     contents: [{ parts: [{ text: buildPrompt(items) }] }],
     generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
@@ -67,7 +68,7 @@ export async function addInsights(items) {
     const timer = setTimeout(() => ctrl.abort(), 60000);
     const r = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify(body),
       signal: ctrl.signal,
     });
