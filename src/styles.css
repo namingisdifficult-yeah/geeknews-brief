@@ -71,6 +71,29 @@ a { color: inherit; }
 }
 .badge.live { color: #1f7a44; }
 
+/* 데이터 상태 배지 + ⓘ 툴팁 */
+.badge-wrap { position: relative; display: inline-flex; align-items: center; gap: 0.2rem; }
+.info-btn {
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  border: none; background: transparent; padding: 0 0.1rem; font-size: 13px; line-height: 1;
+  color: rgba(255,255,255,0.6); font-family: inherit; transition: color 0.15s;
+}
+.info-btn:hover, .info-btn.open { color: #fff; }
+.tip {
+  position: absolute; top: calc(100% + 0.55rem); right: 0; z-index: 30;
+  width: max-content; max-width: 240px; text-align: left; white-space: normal;
+  background: var(--white); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 0.5rem; padding: 0.55rem 0.7rem; font-size: 12px; line-height: 1.55; font-weight: 500;
+  box-shadow: 0 6px 20px rgba(31,61,44,0.22);
+  opacity: 0; visibility: hidden; transform: translateY(-4px);
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+}
+.tip::before {
+  content: ""; position: absolute; bottom: 100%; right: 0.8rem;
+  border: 6px solid transparent; border-bottom-color: var(--white);
+}
+.badge-wrap:hover .tip, .info-btn.open ~ .tip { opacity: 1; visibility: visible; transform: translateY(0); }
+
 .note { margin-top: 0.75rem; border-radius: 0.4rem; padding: 0.5rem 0.75rem; font-size: 12.5px; }
 .note.warn { background: #fff7e8; color: #8a5a00; border: 1px solid #f0e2c2; }
 

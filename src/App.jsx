@@ -69,6 +69,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [warn, setWarn] = useState("");
   const [toast, setToast] = useState("");
+  const [tipOpen, setTipOpen] = useState(false);
 
   const flash = (m) => { setToast(m); setTimeout(() => setToast(""), 1800); };
   const likedCount = Object.values(ratings).filter((r) => r && r.liked).length;
@@ -178,7 +179,23 @@ export default function App() {
             <button className="btn btn-primary" onClick={refresh} disabled={refreshing} type="button">
               <Refresh size={14} /> {refreshing ? "불러오는 중…" : "새로고침"}
             </button>
-            <span className={"badge" + (source === "live" ? " live" : "")}>{source === "live" ? "최신" : "스냅샷"}</span>
+            <span className="badge-wrap">
+              <span className={"badge" + (source === "live" ? " live" : "")}>{source === "live" ? "최신" : "예비 데이터"}</span>
+              <button
+                type="button"
+                className={"info-btn" + (tipOpen ? " open" : "")}
+                onClick={() => setTipOpen((v) => !v)}
+                onBlur={() => setTipOpen(false)}
+                aria-label="데이터 상태 설명"
+              >
+                ⓘ
+              </button>
+              <span className="tip" role="tooltip">
+                {source === "live"
+                  ? "GeekNews에서 수집한 최신 기사를 보고 있어요."
+                  : "실시간 수집에 실패해 앱에 내장된 예비 데이터를 표시 중이에요. ‘새로고침’을 눌러 다시 시도할 수 있어요."}
+              </span>
+            </span>
           </div>
         )}
         {view === "brief" && warn && <div className="note warn">{warn}</div>}
