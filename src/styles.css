@@ -26,6 +26,17 @@ a { color: inherit; }
 .h1 { font-size: 1.9rem; font-weight: 800; line-height: 1.15; margin: 0.25rem 0 0; }
 .sub { font-size: 0.875rem; color: var(--muted); margin: 0.4rem 0 0; }
 
+/* 탭 (오늘의 추천 / 좋아요 한 뉴스) */
+.tabs { display: flex; gap: 0.4rem; margin-top: 1rem; }
+.tab {
+  display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; font-family: inherit;
+  border: 1px solid var(--line); background: var(--white); color: var(--muted);
+  border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 13px; font-weight: 600;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tab:hover { background: #fafafa; }
+.tab.on { background: var(--green); border-color: var(--green); color: #fff; }
+
 /* 툴바 */
 .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 1rem; }
 .btn {
@@ -85,6 +96,32 @@ a { color: inherit; }
 .like-btn:hover { transform: scale(1.03); }
 .like-btn:active { transform: scale(0.96); }
 .like-btn.on { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* 좋아요 한 뉴스 목록 */
+.liked-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.liked-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  border: 1px solid var(--line); background: var(--white); border-radius: 0.5rem;
+  padding: 0.8rem 1rem; transition: box-shadow 0.15s;
+}
+.liked-item:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.liked-title {
+  display: flex; align-items: center; gap: 0.4rem; flex: 1; min-width: 0;
+  text-decoration: none; color: var(--ink); font-size: 14.5px; font-weight: 600; line-height: 1.4;
+}
+.liked-title:hover span { text-decoration: underline; }
+.liked-title .ext, .liked-title svg { opacity: 0.4; flex-shrink: 0; }
+.liked-remove {
+  flex-shrink: 0; cursor: pointer; font-family: inherit;
+  border: none; background: transparent; color: var(--muted);
+  font-size: 15px; line-height: 1; padding: 0.25rem 0.4rem; border-radius: 0.3rem;
+  transition: background 0.15s, color 0.15s;
+}
+.liked-remove:hover { background: #f0eee8; color: var(--ink); }
+.empty {
+  border: 1px dashed var(--line); border-radius: 0.6rem; background: var(--white);
+  padding: 2rem 1.25rem; text-align: center; color: var(--muted); font-size: 13.5px; line-height: 1.7;
+}
 
 /* 스켈레톤 */
 .sk { border: 1px solid var(--line); background: #fff; border-radius: 0.6rem; padding: 1.25rem; }

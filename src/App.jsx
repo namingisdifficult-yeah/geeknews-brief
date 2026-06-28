@@ -64,6 +64,7 @@ export default function App() {
   const [pool, setPool] = useState([]);
   const [picks, setPicks] = useState([]);
   const [ratings, setRatings] = useState({});
+  const [view, setView] = useState("brief"); // brief | liked
   const [source, setSource] = useState("snapshot"); // live | snapshot
   const [refreshing, setRefreshing] = useState(false);
   const [warn, setWarn] = useState("");
@@ -128,11 +129,30 @@ export default function App() {
     const cur = !!ratings[article.id]?.liked;
     const next = { ...ratings };
     if (cur) delete next[article.id];
-    else next[article.id] = { liked: true, title: article.title, tokens: article.tokens, ts: new Date().toISOString() };
+    else next[article.id] = { liked: true, title: article.title, url: article.url, tokens: article.tokens, ts: new Date().toISOString() };
     setRatings(next);
     saveJSON("ratings", next);
     flash(cur ? "좋아요 취소됨" : "좋아요 저장됨 · 추천에 반영돼요");
   };
+
+  // '좋아요 한 뉴스' 목록: 최근 좋아요순. URL이 없는 과거 데이터는 기사 id로 복원.
+  const unlikeById = (id) => {
+    const next = { ...ratings };
+    delete next[id];
+    setRatings(next);
+    saveJSON("ratings", next);
+    flash("좋아요 취소됨");
+  };
+
+  const likedList = Object.entries(ratings)
+    .filter(([, r]) => r && r.liked)
+    .map(([id, r]) => ({
+      id,
+      title: r.title || "(제목 없음)",
+      url: r.url || `https://news.hada.io/topic?id=${id}`,
+      ts: r.ts || "",
+    }))
+    .sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
 
   const pickList = picks.filter((p) => p.bucket === "pick");
   const hotList = picks.filter((p) => p.bucket === "broaden");
@@ -144,17 +164,52 @@ export default function App() {
         <div className="kicker">Daily Brief · GeekNews</div>
         <h1 className="h1">나만의 긱뉴스 브리핑</h1>
         <p className="sub">최근 기사 중 5개 · 관심사 + 좋아요 {likedCount}개 반영 중</p>
-        <div className="toolbar">
-          <button className="btn" onClick={regenerate} type="button"><Refresh size={14} /> 다시 고르기</button>
-          <button className="btn btn-primary" onClick={refresh} disabled={refreshing} type="button">
-            <Refresh size={14} /> {refreshing ? "불러오는 중…" : "새로고침"}
+        <nav className="tabs">
+          <button className={"tab" + (view === "brief" ? " on" : "")} onClick={() => setView("brief")} type="button">
+            오늘의 추천
           </button>
-          <span className={"badge" + (source === "live" ? " live" : "")}>{source === "live" ? "최신" : "스냅샷"}</span>
-        </div>
-        {warn && <div className="note warn">{warn}</div>}
+          <button className={"tab" + (view === "liked" ? " on" : "")} onClick={() => setView("liked")} type="button">
+            <Heart /> 좋아요 한 뉴스{likedCount > 0 ? ` ${likedCount}` : ""}
+          </button>
+        </nav>
+        {view === "brief" && (
+          <div className="toolbar">
+            <button className="btn" onClick={regenerate} type="button"><Refresh size={14} /> 다시 고르기</button>
+            <button className="btn btn-primary" onClick={refresh} disabled={refreshing} type="button">
+              <Refresh size={14} /> {refreshing ? "불러오는 중…" : "새로고침"}
+            </button>
+            <span className={"badge" + (source === "live" ? " live" : "")}>{source === "live" ? "최신" : "스냅샷"}</span>
+          </div>
+        )}
+        {view === "brief" && warn && <div className="note warn">{warn}</div>}
       </header>
 
-      {!ready ? (
+      {view === "liked" ? (
+        <section className="section">
+          <h2 className="section-title">좋아요 한 뉴스 · {likedList.length}</h2>
+          <p className="section-sub">제목을 누르면 해당 뉴스로 이동합니다. 이 기기(브라우저)에 저장돼요.</p>
+          {likedList.length === 0 ? (
+            <div className="empty">
+              아직 좋아요한 뉴스가 없어요.<br />
+              ‘오늘의 추천’에서 카드의 <b>좋아요</b>를 누르면 여기에 모입니다.
+            </div>
+          ) : (
+            <ul className="liked-list">
+              {likedList.map((it) => (
+                <li className="liked-item" key={it.id}>
+                  <a className="liked-title" href={it.url} target="_blank" rel="noopener noreferrer">
+                    <span>{it.title}</span>
+                    <ExtLink />
+                  </a>
+                  <button className="liked-remove" onClick={() => unlikeById(it.id)} type="button" aria-label="좋아요 취소" title="좋아요 취소">
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : !ready ? (
         <div className="grid">
           {[0, 1, 2].map((i) => (
             <div className="sk" key={i}>
