@@ -89,9 +89,80 @@
   .stat .n{font-size:26px;font-weight:800;color:var(--brand-ink)}
   .stat .l{font-size:13px;color:var(--text-soft);margin-top:2px}
 
+  /* ===== Toolbar (title + actions) ===== */
+  .toolbar{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
+  .toolbar .page-title{margin:0}
+  .toolbar .spacer{margin-left:auto}
+
+  /* ===== Search & filter row ===== */
+  .filterbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .search{flex:1;min-width:180px;position:relative}
+  .search input{
+    width:100%;padding:9px 12px 9px 34px;border:1px solid var(--line-strong);
+    border-radius:var(--radius-sm);font-size:14px;background:var(--surface);color:var(--text);
+  }
+  .search input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .search .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:14px}
+  .check{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-soft);cursor:pointer;user-select:none}
+  .check input{width:15px;height:15px;accent-color:var(--brand)}
+
+  /* ===== Member cards ===== */
+  .member-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .member-card{
+    display:block;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:15px 16px;cursor:pointer;transition:border-color .12s, transform .04s;
+  }
+  .member-card:hover{border-color:var(--brand)}
+  .member-card:active{transform:translateY(1px)}
+  .member-card.inactive{opacity:.62}
+  .mc-top{display:flex;align-items:center;gap:11px}
+  .avatar{
+    width:42px;height:42px;border-radius:50%;flex:none;background:var(--brand-soft);color:var(--brand-ink);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;
+  }
+  .mc-name{font-weight:700;font-size:16px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .mc-sub{color:var(--text-soft);font-size:13px;margin-top:1px}
+  .mc-meta{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12.5px;color:var(--text-faint);flex-wrap:wrap}
+  .mc-meta .sep{color:var(--line-strong)}
+  .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+  .tag{font-size:11.5px;font-weight:600;color:var(--brand-ink);background:var(--brand-soft);padding:1px 8px;border-radius:999px}
+  .pill-off{font-size:11px;font-weight:700;color:var(--text-faint);background:var(--surface-2);
+    border:1px solid var(--line);padding:1px 7px;border-radius:999px}
+
+  /* ===== Forms ===== */
+  .form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:20px;max-width:640px}
+  .field{margin-bottom:15px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--text-soft);margin-bottom:5px}
+  .field .req{color:var(--att)}
+  .field .hint{font-weight:400;color:var(--text-faint);font-size:12px}
+  .input,.select,.textarea{
+    width:100%;padding:9px 11px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);
+    font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);
+  }
+  .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .textarea{resize:vertical;min-height:70px;line-height:1.5}
+  .field-row{display:flex;gap:12px}
+  .field-row>.field{flex:1}
+  .form-actions{display:flex;gap:8px;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .form-actions .spacer{margin-left:auto}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--text-soft)}
+  .btn.ghost:hover{background:var(--surface-2)}
+  .btn.danger{border-color:var(--att);color:var(--att);background:var(--surface)}
+  .btn.danger:hover{background:var(--att-soft)}
+  .btn.small{padding:5px 10px;font-size:13px}
+  .err{color:var(--att);font-size:13px;margin-top:8px;min-height:1px}
+
+  .breadcrumb{font-size:13px;color:var(--text-faint);margin-bottom:10px}
+  .breadcrumb a:hover{color:var(--brand);text-decoration:underline}
+
   @media (max-width:560px){
     .seed-grid{grid-template-columns:1fr 1fr}
     .brand span.full{display:none}
+    .member-grid{grid-template-columns:1fr}
+    .field-row{flex-direction:column;gap:0}
+    .form{padding:16px}
   }
 </style>
 </head>
@@ -251,6 +322,61 @@
     return d;
   }
 
+  /* ---------- 파생값 계산 (저장 안 함, 그릴 때 실시간) ---------- */
+  var Compute = {
+    meetingsOf: function(d, memberId){
+      return d.meetings
+        .filter(function(m){ return m.memberId===memberId; })
+        .sort(function(a,b){ return new Date(b.date) - new Date(a.date); }); // 최신순
+    },
+    lastMeeting: function(d, memberId){
+      var ms = this.meetingsOf(d, memberId);
+      return ms.length ? ms[0] : null;
+    },
+    meetingCount: function(d, memberId){
+      return d.meetings.filter(function(m){ return m.memberId===memberId; }).length;
+    },
+    latestMood: function(d, memberId){
+      var last = this.lastMeeting(d, memberId);
+      return last ? last.mood : null;
+    },
+    openActionsOf: function(d, memberId){
+      return d.actionItems.filter(function(a){ return a.memberId===memberId && a.status==="todo"; });
+    },
+    daysSince: function(iso){
+      if (!iso) return null;
+      var diff = Date.now() - new Date(iso).getTime();
+      return Math.floor(diff / 86400000);
+    }
+  };
+
+  /* ---------- 표시 헬퍼 ---------- */
+  function initials(name){
+    name = (name||"").trim();
+    return name ? name.slice(0, name.length>2?1:2) : "·"; // 한글 이름은 성 한 글자
+  }
+  function fmtDate(iso){
+    if (!iso) return "";
+    var x = new Date(iso);
+    return x.getFullYear()+". "+(x.getMonth()+1)+". "+x.getDate()+".";
+  }
+  function relDays(iso){
+    var n = Compute.daysSince(iso);
+    if (n==null) return "기록 없음";
+    if (n<=0) return "오늘";
+    if (n===1) return "어제";
+    return n+"일 전";
+  }
+  var MOOD = {
+    positive:{label:"긍정", cls:"pos", icon:"🙂"},
+    neutral :{label:"중립", cls:"neu", icon:"😐"},
+    attention:{label:"주의 필요", cls:"att", icon:"⚠️"}
+  };
+  function moodBadge(mood){
+    var m = MOOD[mood]; if(!m) return "";
+    return '<span class="badge '+m.cls+'">'+m.icon+' '+m.label+'</span>';
+  }
+
   /* ---------- 라우터 ---------- */
   // 등록된 라우트: 패턴(정규식) + 핸들러
   var routes = [];
@@ -329,17 +455,205 @@
   }
   function stat(n,l){ return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+esc(l)+'</div></div>'; }
 
-  function viewMembersStub(app){
+  // 목록 화면의 검색/필터 상태(메모리 유지)
+  var membersUI = { q:"", showInactive:false };
+
+  function viewMembers(app){
     var d = Store.load();
-    var list = d.members.map(function(m){
-      return '<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>'+esc(m.name)+'</b> '+
-             '<span class="muted">· '+esc(m.position)+' · '+esc(m.team)+'</span></li>';
-    }).join("");
     app.innerHTML =
-      '<h1 class="page-title">구성원</h1>'+
+      '<div class="toolbar">'+
+        '<h1 class="page-title">구성원</h1>'+
+        '<div class="spacer"></div>'+
+        '<a class="btn primary" href="#/member/new">+ 구성원 추가</a>'+
+      '</div>'+
+      '<div class="filterbar">'+
+        '<div class="search"><span class="icon">🔍</span>'+
+          '<input id="m-search" type="search" placeholder="이름·직책·팀·태그 검색" value="'+esc(membersUI.q)+'" />'+
+        '</div>'+
+        '<label class="check"><input id="m-inactive" type="checkbox"'+(membersUI.showInactive?" checked":"")+' /> 퇴사 포함</label>'+
+      '</div>'+
+      '<div id="m-list"></div>';
+
+    var search = document.getElementById("m-search");
+    var inactive = document.getElementById("m-inactive");
+    search.addEventListener("input", function(){ membersUI.q = search.value; renderMemberList(); });
+    inactive.addEventListener("change", function(){ membersUI.showInactive = inactive.checked; renderMemberList(); });
+    renderMemberList();
+  }
+
+  function renderMemberList(){
+    var host = document.getElementById("m-list");
+    if (!host) return;
+    var d = Store.load();
+    var q = membersUI.q.trim().toLowerCase();
+
+    var list = d.members.filter(function(m){
+      if (!membersUI.showInactive && m.status==="inactive") return false;
+      if (!q) return true;
+      var hay = [m.name, m.position, m.team, (m.tags||[]).join(" "), m.note].join(" ").toLowerCase();
+      return hay.indexOf(q) >= 0;
+    });
+
+    // 정렬: 재직 우선 → 최근 면담 오래된 순(챙길 사람 먼저) → 이름
+    list.sort(function(a,b){
+      if ((a.status==="inactive") !== (b.status==="inactive")) return a.status==="inactive"?1:-1;
+      var la = Compute.lastMeeting(d,a.id), lb = Compute.lastMeeting(d,b.id);
+      var ta = la?new Date(la.date).getTime():0, tb = lb?new Date(lb.date).getTime():0;
+      if (ta!==tb) return ta-tb; // 오래된(작은) 것 먼저
+      return a.name.localeCompare(b.name,"ko");
+    });
+
+    if (!d.members.length){
+      host.innerHTML = '<div class="empty"><div class="big">👥</div>아직 등록된 구성원이 없습니다.<br>'+
+        '<span class="muted">오른쪽 위 <b>+ 구성원 추가</b>로 시작하세요.</span><br><br>'+
+        '<a class="btn primary" href="#/member/new">+ 구성원 추가</a></div>';
+      return;
+    }
+    if (!list.length){
+      host.innerHTML = '<div class="empty"><div class="big">🔍</div>조건에 맞는 구성원이 없습니다.</div>';
+      return;
+    }
+
+    host.innerHTML = '<div class="member-grid">'+ list.map(memberCard.bind(null,d)).join("") +'</div>';
+  }
+
+  function memberCard(d, m){
+    var last = Compute.lastMeeting(d, m.id);
+    var cnt = Compute.meetingCount(d, m.id);
+    var open = Compute.openActionsOf(d, m.id).length;
+    var mood = Compute.latestMood(d, m.id);
+    var tags = (m.tags||[]).slice(0,4).map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join("");
+    return ''+
+    '<a class="member-card'+(m.status==="inactive"?" inactive":"")+'" href="#/member/'+esc(m.id)+'">'+
+      '<div class="mc-top">'+
+        '<div class="avatar">'+esc(initials(m.name))+'</div>'+
+        '<div style="min-width:0">'+
+          '<div class="mc-name">'+esc(m.name)+
+            (m.status==="inactive"?' <span class="pill-off">퇴사</span>':'')+
+            (mood?' '+moodBadge(mood):'')+
+          '</div>'+
+          '<div class="mc-sub">'+esc(m.position||"")+(m.team?' · '+esc(m.team):'')+'</div>'+
+        '</div>'+
+      '</div>'+
+      (tags?'<div class="tags">'+tags+'</div>':'')+
+      '<div class="mc-meta">'+
+        '<span>마지막 면담 '+(last?esc(relDays(last.date)):'없음')+'</span>'+
+        '<span class="sep">·</span><span>누적 '+cnt+'회</span>'+
+        (open?'<span class="sep">·</span><span style="color:var(--att);font-weight:600">미완료 액션 '+open+'</span>':'')+
+      '</div>'+
+    '</a>';
+  }
+
+  /* ---------- 구성원 추가/수정 폼 ---------- */
+  function viewMemberForm(app, params){
+    var d = Store.load();
+    var id = params && params[0];
+    var isNew = !id || id==="new";
+    var m = isNew ? null : d.members.filter(function(x){return x.id===id;})[0];
+    if (!isNew && !m){ app.innerHTML = viewNotFound("구성원 "+id); return; }
+
+    var v = m || { name:"", position:"", team:"", joinDate:"", status:"active", tags:[], note:"" };
+
+    app.innerHTML =
+      '<div class="breadcrumb"><a href="#/members">구성원</a> › '+(isNew?'새 구성원':esc(v.name)+' 수정')+'</div>'+
+      '<h1 class="page-title">'+(isNew?'구성원 추가':'구성원 수정')+'</h1>'+
+      '<form class="form" id="member-form" autocomplete="off">'+
+        '<div class="field">'+
+          '<label>이름 <span class="req">*</span></label>'+
+          '<input class="input" name="name" value="'+esc(v.name)+'" placeholder="예: 박서준" />'+
+        '</div>'+
+        '<div class="field-row">'+
+          '<div class="field"><label>직책</label>'+
+            '<input class="input" name="position" value="'+esc(v.position)+'" placeholder="예: 시니어 개발자" /></div>'+
+          '<div class="field"><label>부서/팀</label>'+
+            '<input class="input" name="team" value="'+esc(v.team)+'" placeholder="예: 플랫폼파트" /></div>'+
+        '</div>'+
+        '<div class="field-row">'+
+          '<div class="field"><label>합류일</label>'+
+            '<input class="input" type="date" name="joinDate" value="'+esc(v.joinDate||"")+'" /></div>'+
+          '<div class="field"><label>상태</label>'+
+            '<select class="select" name="status">'+
+              '<option value="active"'+(v.status!=="inactive"?" selected":"")+'>재직</option>'+
+              '<option value="inactive"'+(v.status==="inactive"?" selected":"")+'>퇴사</option>'+
+            '</select></div>'+
+        '</div>'+
+        '<div class="field"><label>태그 <span class="hint">(쉼표로 구분)</span></label>'+
+          '<input class="input" name="tags" value="'+esc((v.tags||[]).join(", "))+'" placeholder="예: 백엔드, 멘토" /></div>'+
+        '<div class="field"><label>기본 메모</label>'+
+          '<textarea class="textarea" name="note" placeholder="이 구성원에 대한 기본 메모">'+esc(v.note||"")+'</textarea></div>'+
+        '<div class="err" id="form-err"></div>'+
+        '<div class="form-actions">'+
+          (isNew?'':'<button type="button" class="btn danger small" id="btn-toggle-status">'+(v.status==="inactive"?'재직으로 복귀':'퇴사 처리')+'</button>')+
+          '<div class="spacer"></div>'+
+          '<a class="btn ghost" href="'+(isNew?'#/members':'#/member/'+esc(id))+'">취소</a>'+
+          '<button type="submit" class="btn primary">저장</button>'+
+        '</div>'+
+      '</form>';
+
+    var form = document.getElementById("member-form");
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      saveMemberFromForm(form, m);
+    });
+    var toggle = document.getElementById("btn-toggle-status");
+    if (toggle){
+      toggle.addEventListener("click", function(){
+        var goInactive = (m.status!=="inactive");
+        if (goInactive && !confirm('"'+m.name+'"님을 퇴사 처리할까요?\n목록에서 숨겨지지만 기록은 그대로 보존됩니다.')) return;
+        m.status = goInactive ? "inactive" : "active";
+        m.updatedAt = nowISO();
+        if (Store.save(d)) navigate("#/member/"+m.id);
+      });
+    }
+    form.elements["name"].focus();
+  }
+
+  function saveMemberFromForm(form, existing){
+    var d = Store.load();
+    var name = form.elements["name"].value.trim();
+    var errEl = document.getElementById("form-err");
+    if (!name){ errEl.textContent = "이름은 필수입니다."; form.elements["name"].focus(); return; }
+
+    var tags = form.elements["tags"].value.split(",").map(function(t){return t.trim();}).filter(Boolean);
+    var fields = {
+      name:name,
+      position: form.elements["position"].value.trim(),
+      team: form.elements["team"].value.trim(),
+      joinDate: form.elements["joinDate"].value || "",
+      status: form.elements["status"].value==="inactive"?"inactive":"active",
+      tags: tags,
+      note: form.elements["note"].value.trim()
+    };
+
+    var targetId;
+    if (existing){
+      var ref = d.members.filter(function(x){return x.id===existing.id;})[0];
+      Object.assign(ref, fields, { updatedAt:nowISO() });
+      targetId = ref.id;
+    } else {
+      var m = Object.assign({ id:uuid() }, fields, { createdAt:nowISO(), updatedAt:nowISO() });
+      d.members.push(m);
+      targetId = m.id;
+    }
+    if (Store.save(d)) navigate("#/member/"+targetId);
+  }
+
+  /* ---------- 구성원 상세 (3단계에서 완성 — 현재 임시) ---------- */
+  function viewMemberDetailStub(app, params){
+    var d = Store.load();
+    var id = params[0];
+    var m = d.members.filter(function(x){return x.id===id;})[0];
+    if (!m){ app.innerHTML = viewNotFound("구성원 "+id); return; }
+    var cnt = Compute.meetingCount(d, m.id);
+    app.innerHTML =
+      '<div class="breadcrumb"><a href="#/members">구성원</a> › '+esc(m.name)+'</div>'+
+      '<div class="toolbar"><h1 class="page-title">'+esc(m.name)+'</h1>'+
+        '<div class="spacer"></div>'+
+        '<a class="btn small" href="#/member/'+esc(m.id)+'/edit">수정</a></div>'+
       '<div class="card" style="padding:18px">'+
-        '<div class="muted" style="margin-bottom:8px">구성원 목록 화면은 <b>2단계</b>에서 완성됩니다. 현재 시드된 구성원:</div>'+
-        '<ul style="list-style:none;margin:0;padding:0">'+(list||'<li class="muted">없음</li>')+'</ul>'+
+        '<div class="mc-sub">'+esc(m.position||"")+(m.team?' · '+esc(m.team):'')+'</div>'+
+        '<p class="muted" style="margin-top:10px">구성원 상세(프로필·미완료 액션·면담 타임라인)와 면담 작성은 '+
+        '<b>3단계</b>에서 완성됩니다. 현재 누적 면담 '+cnt+'회.</p>'+
       '</div>';
   }
 
@@ -366,7 +680,10 @@
 
   /* ---------- 라우트 등록 ---------- */
   route(/^\/$/, viewDashboard);
-  route(/^\/members$/, viewMembersStub);
+  route(/^\/members$/, viewMembers);
+  route(/^\/member\/new$/, viewMemberForm);
+  route(/^\/member\/([^\/]+)\/edit$/, viewMemberForm);
+  route(/^\/member\/([^\/]+)$/, viewMemberDetailStub);
   route(/^\/settings$/, viewSettingsStub);
 
   /* ---------- 부트 ---------- */
