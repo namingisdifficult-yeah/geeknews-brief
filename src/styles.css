@@ -2,6 +2,7 @@
   --paper: #e9ede7;   /* 세이지 페이지 배경 */
   --ink: #1b2a22;     /* 짙은 그린-그레이 본문 */
   --green: #20402e;   /* 주조색: 딥 포레스트 그린 */
+  --header: #1f3d2c;  /* 헤더 패널 배경(짙은 그린) */
   --muted: #5e6b61;   /* 그린-그레이 보조 텍스트 */
   --line: #dde3dc;    /* 부드러운 경계선 */
   --cream: #e8dfca;   /* 크림 액센트 */
@@ -20,11 +21,26 @@ a { color: inherit; }
 
 .container { max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.25rem; }
 
-/* 마스트헤드 */
-.masthead { border-bottom: 1px solid var(--line); padding-bottom: 1.25rem; margin-bottom: 2rem; }
-.kicker { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
-.h1 { font-size: 1.9rem; font-weight: 800; line-height: 1.15; margin: 0.25rem 0 0; }
-.sub { font-size: 0.875rem; color: var(--muted); margin: 0.4rem 0 0; }
+/* 마스트헤드 — 짙은 그린 패널 + 흰 글씨 */
+.masthead {
+  background: var(--header); color: #fff;
+  border-radius: 0.9rem; padding: 1.6rem 1.5rem 1.4rem; margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(31, 61, 44, 0.18);
+}
+.kicker { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+.h1 { font-size: 1.9rem; font-weight: 800; line-height: 1.15; margin: 0.25rem 0 0; color: #fff; }
+.sub { font-size: 0.875rem; color: rgba(255,255,255,0.72); margin: 0.4rem 0 0; }
+
+/* 헤더 내부 컨트롤 — 어두운 배경 위에서 읽히도록 재배색 */
+.masthead .tab { background: transparent; border-color: rgba(255,255,255,0.3); color: #fff; }
+.masthead .tab:hover { background: rgba(255,255,255,0.12); }
+.masthead .tab.on { background: #fff; border-color: #fff; color: var(--header); }
+.masthead .btn { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
+.masthead .btn:hover { background: rgba(255,255,255,0.2); }
+.masthead .btn-primary { background: #fff; border-color: #fff; color: var(--header); }
+.masthead .btn-primary:hover { background: #fff; opacity: 0.88; }
+.masthead .badge { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); }
+.masthead .badge.live { color: #8fe3a6; }
 
 /* 탭 (오늘의 추천 / 좋아요 한 뉴스) */
 .tabs { display: flex; gap: 0.4rem; margin-top: 1rem; }
