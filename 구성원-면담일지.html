@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>구성원 면담일지</title>
+<!--
+  구성원 면담일지 — 파일럿 (단일 HTML 파일)
+  - 외부 의존성/CDN 없음, 오프라인 동작
+  - 데이터: localStorage["myeondam_ilji_v1"]
+  - 더블클릭으로 브라우저에서 바로 열림
+  빌드 단계: [1] 뼈대 (라우팅 + 저장소 유틸 + 샘플 시드)
+-->
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#f0f2f5;
+    --text:#1f2733; --text-soft:#5b6675; --text-faint:#8b94a3;
+    --line:#e3e7ec; --line-strong:#d2d8e0;
+    --brand:#3a5a8c; --brand-soft:#e9eff7; --brand-ink:#27406a;
+    --pos:#2f8f5b; --pos-soft:#e4f4ea;
+    --neu:#7a8493; --neu-soft:#eef0f3;
+    --att:#c0492f; --att-soft:#fbe9e4;
+    --warn:#b9772a; --warn-soft:#fbf0df;
+    --radius:12px; --radius-sm:8px;
+    --shadow:0 1px 2px rgba(31,39,51,.06), 0 2px 8px rgba(31,39,51,.05);
+    --maxw:880px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--font);
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+
+  /* ===== App shell ===== */
+  .topbar{
+    position:sticky; top:0; z-index:20; background:var(--surface);
+    border-bottom:1px solid var(--line); box-shadow:var(--shadow);
+  }
+  .topbar-inner{
+    max-width:var(--maxw); margin:0 auto; padding:10px 16px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px;color:var(--brand-ink)}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--brand);
+    display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+  .nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  .nav a{
+    padding:7px 12px;border-radius:999px;color:var(--text-soft);font-size:14px;font-weight:500;
+  }
+  .nav a:hover{background:var(--surface-2);color:var(--text)}
+  .nav a.active{background:var(--brand-soft);color:var(--brand-ink);font-weight:600}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:20px 16px 64px}
+
+  /* ===== Generic UI ===== */
+  .page-title{font-size:20px;font-weight:700;margin:2px 0 16px}
+  .muted{color:var(--text-faint)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow)}
+  .empty{
+    text-align:center;padding:48px 20px;color:var(--text-faint);
+    border:1px dashed var(--line-strong);border-radius:var(--radius);background:var(--surface);
+  }
+  .empty .big{font-size:34px;margin-bottom:8px}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+    border:1px solid var(--line-strong);background:var(--surface);color:var(--text);
+    padding:8px 14px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;
+  }
+  .btn:hover{background:var(--surface-2)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:var(--brand-ink)}
+
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;
+    padding:2px 9px;border-radius:999px;background:var(--neu-soft);color:var(--neu)}
+  .badge.pos{background:var(--pos-soft);color:var(--pos)}
+  .badge.neu{background:var(--neu-soft);color:var(--neu)}
+  .badge.att{background:var(--att-soft);color:var(--att)}
+
+  /* dev/skeleton helper (1단계 임시 표시) */
+  .seed-info{margin-top:18px}
+  .seed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;text-align:center;box-shadow:var(--shadow)}
+  .stat .n{font-size:26px;font-weight:800;color:var(--brand-ink)}
+  .stat .l{font-size:13px;color:var(--text-soft);margin-top:2px}
+
+  @media (max-width:560px){
+    .seed-grid{grid-template-columns:1fr 1fr}
+    .brand span.full{display:none}
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="#/" class="brand"><span class="dot">面</span><span class="full">구성원 면담일지</span></a>
+      <nav class="nav" id="nav">
+        <a href="#/" data-route="/">대시보드</a>
+        <a href="#/members" data-route="/members">구성원</a>
+        <a href="#/settings" data-route="/settings">설정</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap" id="app"><!-- 화면이 여기에 렌더링됨 --></main>
+
+<script>
+/* =========================================================================
+ *  구성원 면담일지 — 1단계: 저장소 유틸 + 라우터 + 샘플 시드
+ * ========================================================================= */
+(function(){
+  "use strict";
+
+  /* ---------- 상수 ---------- */
+  var STORAGE_KEY = "myeondam_ilji_v1";
+
+  /* ---------- 작은 헬퍼 ---------- */
+  function uuid(){
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    // 폴백 (구형 브라우저)
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){
+      var r = Math.random()*16|0, v = c==="x"? r : (r&0x3|0x8); return v.toString(16);
+    });
+  }
+  function nowISO(){ return new Date().toISOString(); }
+  function daysAgoISO(n){ var d=new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+  function ymd(d){ // Date -> YYYY-MM-DD
+    var x = (d instanceof Date)? d : new Date(d);
+    var m = ("0"+(x.getMonth()+1)).slice(-2), day=("0"+x.getDate()).slice(-2);
+    return x.getFullYear()+"-"+m+"-"+day;
+  }
+  function esc(s){ // HTML escape
+    return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  /* ---------- 저장소 (localStorage) ---------- */
+  var Store = {
+    load: function(){
+      var raw;
+      try { raw = localStorage.getItem(STORAGE_KEY); }
+      catch(e){ console.warn("localStorage 읽기 실패", e); return defaultData(); }
+      if (!raw){ // 최초 실행 → 샘플 시드
+        var seeded = seedData();
+        this.save(seeded);
+        return seeded;
+      }
+      try {
+        var data = JSON.parse(raw);
+        return normalize(data);
+      } catch(e){
+        console.error("데이터 파싱 실패 — 기본값으로 시작", e);
+        return defaultData();
+      }
+    },
+    save: function(data){
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return true;
+      } catch(e){
+        console.error("저장 실패", e);
+        alert("저장에 실패했습니다. 브라우저 저장공간이 가득 찼거나 차단되었을 수 있어요.\n(시크릿/사생활보호 모드에서는 저장이 제한될 수 있습니다.)");
+        return false;
+      }
+    }
+  };
+
+  function defaultData(){
+    return {
+      members:[], meetings:[], actionItems:[],
+      settings:{
+        displayName:"", orgName:"",
+        meetingTypes:["정기","성과","고충","경력개발","온보딩","수시"],
+        overdueDays:30
+      }
+    };
+  }
+
+  // 외부에서 가져온 데이터 등에 누락 필드가 있어도 안전하게 보정
+  function normalize(d){
+    var base = defaultData();
+    d = d || {};
+    return {
+      members: Array.isArray(d.members)? d.members : [],
+      meetings: Array.isArray(d.meetings)? d.meetings : [],
+      actionItems: Array.isArray(d.actionItems)? d.actionItems : [],
+      settings: Object.assign({}, base.settings, d.settings||{})
+    };
+  }
+
+  /* ---------- 샘플 데이터 시드 ---------- */
+  function seedData(){
+    var d = defaultData();
+    d.settings.displayName = "김리더";
+    d.settings.orgName = "프로덕트팀";
+
+    var m1=uuid(), m2=uuid(), m3=uuid();
+    d.members = [
+      { id:m1, name:"박서준", position:"시니어 개발자", team:"플랫폼파트", joinDate:"2021-03-02",
+        status:"active", tags:["백엔드","멘토"], note:"차분하고 책임감 강함. 최근 기술리드 역할에 관심.",
+        createdAt:daysAgoISO(400), updatedAt:daysAgoISO(12) },
+      { id:m2, name:"이하늘", position:"프로덕트 디자이너", team:"디자인파트", joinDate:"2022-09-15",
+        status:"active", tags:["UX","신규입사"], note:"성장 욕구 큼. 피드백을 구체적으로 주는 게 효과적.",
+        createdAt:daysAgoISO(280), updatedAt:daysAgoISO(40) },
+      { id:m3, name:"최도윤", position:"데이터 분석가", team:"데이터파트", joinDate:"2020-01-06",
+        status:"active", tags:["분석","리텐션"], note:"요즘 업무 과부하 신호. 주의 깊게 관찰 필요.",
+        createdAt:daysAgoISO(700), updatedAt:daysAgoISO(45) }
+    ];
+
+    var mt1=uuid(), mt2=uuid(), mt3=uuid(), mt4=uuid();
+    d.meetings = [
+      { id:mt1, memberId:m1, date:daysAgoISO(12), type:"정기", format:"대면",
+        topics:["분기 목표 점검","기술리드 트랙"], summary:"이번 분기 목표 순항 중. 기술리드 트랙에 대한 의지를 확인함.",
+        memberVoice:"플랫폼 안정화 다음 단계로 리드 역할을 맡아보고 싶습니다.",
+        leaderFeedback:"좋은 방향. 다음 스프린트에 작은 리드 경험부터 맡겨보기로 함.",
+        mood:"positive", privateNote:"리더십 잠재력 충분. 승진 후보로 염두.",
+        createdAt:daysAgoISO(12), updatedAt:daysAgoISO(12) },
+      { id:mt2, memberId:m1, date:daysAgoISO(55), type:"성과", format:"대면",
+        topics:["상반기 성과 리뷰"], summary:"상반기 핵심 지표 목표 초과 달성. 협업 평판도 좋음.",
+        memberVoice:"문서화에 더 신경 쓰겠습니다.",
+        leaderFeedback:"성과 우수. 문서화 습관만 보완하면 완벽.",
+        mood:"positive", privateNote:"",
+        createdAt:daysAgoISO(55), updatedAt:daysAgoISO(55) },
+      { id:mt3, memberId:m2, date:daysAgoISO(40), type:"온보딩", format:"화상",
+        topics:["3개월 적응 점검"], summary:"팀 적응 순조. 협업 도구 익숙해짐. 디자인 시스템 기여 시작.",
+        memberVoice:"리서치를 더 깊게 해보고 싶어요.",
+        leaderFeedback:"UX 리서치 교육 지원을 알아보기로 함.",
+        mood:"neutral", privateNote:"",
+        createdAt:daysAgoISO(40), updatedAt:daysAgoISO(40) },
+      { id:mt4, memberId:m3, date:daysAgoISO(45), type:"고충", format:"대면",
+        topics:["업무량","번아웃 우려"], summary:"동시 진행 프로젝트가 많아 피로 누적. 우선순위 재조정 필요.",
+        memberVoice:"세 개 프로젝트를 동시에 보는 게 버겁습니다.",
+        leaderFeedback:"한 프로젝트를 다른 분석가에게 이관하기로 약속.",
+        mood:"attention", privateNote:"이탈 위험 신호. 2주 내 재확인 필요.",
+        createdAt:daysAgoISO(45), updatedAt:daysAgoISO(45) }
+    ];
+
+    d.actionItems = [
+      { id:uuid(), memberId:m1, meetingId:mt1, content:"다음 스프린트에 소규모 리드 역할 배정",
+        assignee:"leader", dueDate:ymd(daysAgoISO(-7)), status:"todo", completedAt:null, createdAt:daysAgoISO(12) },
+      { id:uuid(), memberId:m2, meetingId:mt3, content:"외부 UX 리서치 교육 과정 알아보고 신청 지원",
+        assignee:"leader", dueDate:ymd(daysAgoISO(-3)), status:"todo", completedAt:null, createdAt:daysAgoISO(40) },
+      { id:uuid(), memberId:m3, meetingId:mt4, content:"리텐션 분석 프로젝트를 다른 분석가에게 이관",
+        assignee:"leader", dueDate:ymd(daysAgoISO(2)), status:"todo", completedAt:null, createdAt:daysAgoISO(45) }
+    ];
+    return d;
+  }
+
+  /* ---------- 라우터 ---------- */
+  // 등록된 라우트: 패턴(정규식) + 핸들러
+  var routes = [];
+  function route(pattern, handler){ routes.push({ pattern:pattern, handler:handler }); }
+
+  function parseHash(){
+    var h = location.hash.replace(/^#/, "");
+    if (!h || h==="/") return { path:"/", query:{} };
+    var parts = h.split("?");
+    var path = parts[0];
+    var query = {};
+    if (parts[1]){
+      parts[1].split("&").forEach(function(kv){
+        var p = kv.split("=");
+        query[decodeURIComponent(p[0])] = decodeURIComponent(p[1]||"");
+      });
+    }
+    if (path.length>1 && path.charAt(path.length-1)==="/") path = path.slice(0,-1);
+    return { path:path, query:query };
+  }
+
+  function render(){
+    var loc = parseHash();
+    var app = document.getElementById("app");
+    var matched = null, params = null;
+    for (var i=0;i<routes.length;i++){
+      var m = loc.path.match(routes[i].pattern);
+      if (m){ matched = routes[i]; params = m.slice(1); break; }
+    }
+    if (!matched){ app.innerHTML = viewNotFound(loc.path); }
+    else {
+      try { matched.handler(app, params, loc.query); }
+      catch(e){
+        console.error(e);
+        app.innerHTML = '<div class="empty"><div class="big">⚠️</div>화면을 그리는 중 오류가 발생했습니다.<br><span class="muted">'+esc(e.message)+'</span></div>';
+      }
+    }
+    updateNav(loc.path);
+    window.scrollTo(0,0);
+  }
+
+  function updateNav(path){
+    var links = document.querySelectorAll("#nav a");
+    links.forEach(function(a){
+      var r = a.getAttribute("data-route");
+      var active = (r==="/") ? (path==="/") :
+                   (path===r || path.indexOf(r)===0);
+      a.classList.toggle("active", active);
+    });
+  }
+
+  function navigate(hash){ location.hash = hash; }
+
+  /* ---------- 화면들 (1단계: 골격/임시) ---------- */
+  function viewDashboard(app){
+    var d = Store.load();
+    var memActive = d.members.filter(function(m){return m.status!=="inactive";}).length;
+    app.innerHTML =
+      '<h1 class="page-title">대시보드</h1>'+
+      '<div class="card" style="padding:18px">'+
+        '<div style="font-weight:700">'+esc(d.settings.displayName||"리더")+'님, 안녕하세요 👋</div>'+
+        '<div class="muted" style="margin-top:4px">'+esc(d.settings.orgName||"")+
+        ' · 오늘 챙길 것을 여기에서 한눈에 보여드릴 예정입니다 (5단계에서 구현).</div>'+
+      '</div>'+
+      '<div class="seed-info">'+
+        '<div class="muted" style="font-size:13px;margin-bottom:4px">현재 저장된 데이터 (1단계 확인용)</div>'+
+        '<div class="seed-grid">'+
+          stat(memActive, "재직 구성원")+
+          stat(d.meetings.length, "면담 기록")+
+          stat(d.actionItems.filter(function(a){return a.status==="todo";}).length, "미완료 액션")+
+        '</div>'+
+        '<p class="muted" style="font-size:13px;margin-top:14px">'+
+          '뼈대(라우팅·저장소·샘플 시드)가 동작합니다. 상단 <b>구성원</b> 탭으로 이동해 보세요. '+
+          '다음 단계부터 실제 화면을 채웁니다.</p>'+
+      '</div>';
+  }
+  function stat(n,l){ return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+esc(l)+'</div></div>'; }
+
+  function viewMembersStub(app){
+    var d = Store.load();
+    var list = d.members.map(function(m){
+      return '<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>'+esc(m.name)+'</b> '+
+             '<span class="muted">· '+esc(m.position)+' · '+esc(m.team)+'</span></li>';
+    }).join("");
+    app.innerHTML =
+      '<h1 class="page-title">구성원</h1>'+
+      '<div class="card" style="padding:18px">'+
+        '<div class="muted" style="margin-bottom:8px">구성원 목록 화면은 <b>2단계</b>에서 완성됩니다. 현재 시드된 구성원:</div>'+
+        '<ul style="list-style:none;margin:0;padding:0">'+(list||'<li class="muted">없음</li>')+'</ul>'+
+      '</div>';
+  }
+
+  function viewSettingsStub(app){
+    var d = Store.load();
+    app.innerHTML =
+      '<h1 class="page-title">설정</h1>'+
+      '<div class="card" style="padding:18px">'+
+        '<div class="muted">설정·백업 화면은 <b>6단계</b>에서 완성됩니다.</div>'+
+        '<ul style="color:var(--text-soft);font-size:14px">'+
+          '<li>리더: '+esc(d.settings.displayName||"-")+'</li>'+
+          '<li>조직: '+esc(d.settings.orgName||"-")+'</li>'+
+          '<li>면담 유형: '+esc(d.settings.meetingTypes.join(", "))+'</li>'+
+          '<li>면담 필요 기준: '+esc(d.settings.overdueDays)+'일</li>'+
+        '</ul>'+
+      '</div>';
+  }
+
+  function viewNotFound(path){
+    return '<div class="empty"><div class="big">🧭</div>없는 화면입니다.<br>'+
+           '<span class="muted">'+esc(path)+'</span><br><br>'+
+           '<a class="btn" href="#/">대시보드로</a></div>';
+  }
+
+  /* ---------- 라우트 등록 ---------- */
+  route(/^\/$/, viewDashboard);
+  route(/^\/members$/, viewMembersStub);
+  route(/^\/settings$/, viewSettingsStub);
+
+  /* ---------- 부트 ---------- */
+  // 전역 노출 (다음 단계에서 확장에 사용)
+  window.App = { Store:Store, navigate:navigate, render:render,
+                 helpers:{ uuid:uuid, nowISO:nowISO, ymd:ymd, esc:esc, daysAgoISO:daysAgoISO } };
+
+  window.addEventListener("hashchange", render);
+  window.addEventListener("DOMContentLoaded", function(){
+    Store.load();      // 최초 시드 보장
+    if (!location.hash) location.hash = "#/";
+    render();
+  });
+  // DOMContentLoaded가 이미 지났을 경우 대비
+  if (document.readyState!=="loading"){
+    Store.load(); if(!location.hash) location.hash="#/"; render();
+  }
+})();
+</script>
+</body>
+</html>
