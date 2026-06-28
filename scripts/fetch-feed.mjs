@@ -63,12 +63,15 @@ async function main() {
   }
 
   // "이게 왜 중요한지" 인사이트 생성(Gemini 무료 티어). 키 없으면 조용히 건너뜀.
-  // 화면엔 최신 기사 일부만 노출되므로(앱의 후보 풀≈18개), 최근 24건에만 생성해
-  // 토큰·할당량을 아끼고 응답 잘림을 방지. slice는 같은 객체 참조라 결과가 items에 반영됨.
+  // 화면의 5개는 브라우저에서 사용자별로 뽑히므로 빌드 시점엔 특정 불가.
+  // 단, 그 5개는 항상 recommend.js의 buildPool(최근 18개) 안에서 선정되므로,
+  // 이 18개에만 생성하면 어떤 5개가 뽑혀도 인사이트가 보장되고 토큰도 최소화됨.
+  // slice는 같은 객체 참조라 결과가 원본 items에 그대로 반영됨.
+  const POOL_SIZE = 18; // recommend.js의 buildPool slice(0,18)과 일치
   try {
     const recent = [...items]
       .sort((a, b) => new Date(b.published || b.date || 0) - new Date(a.published || a.date || 0))
-      .slice(0, 24);
+      .slice(0, POOL_SIZE);
     await addInsights(recent);
   } catch (e) {
     console.warn("인사이트 생성 단계 예외(무시):", e.message);
