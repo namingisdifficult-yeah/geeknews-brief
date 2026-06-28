@@ -63,8 +63,13 @@ async function main() {
   }
 
   // "이게 왜 중요한지" 인사이트 생성(Gemini 무료 티어). 키 없으면 조용히 건너뜀.
+  // 화면엔 최신 기사 일부만 노출되므로(앱의 후보 풀≈18개), 최근 24건에만 생성해
+  // 토큰·할당량을 아끼고 응답 잘림을 방지. slice는 같은 객체 참조라 결과가 items에 반영됨.
   try {
-    await addInsights(items);
+    const recent = [...items]
+      .sort((a, b) => new Date(b.published || b.date || 0) - new Date(a.published || a.date || 0))
+      .slice(0, 24);
+    await addInsights(recent);
   } catch (e) {
     console.warn("인사이트 생성 단계 예외(무시):", e.message);
   }
