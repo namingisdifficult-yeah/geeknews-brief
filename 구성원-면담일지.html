@@ -157,12 +157,81 @@
   .breadcrumb{font-size:13px;color:var(--text-faint);margin-bottom:10px}
   .breadcrumb a:hover{color:var(--brand);text-decoration:underline}
 
+  /* ===== Member detail: profile header ===== */
+  .profile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:20px}
+  .profile-head{display:flex;align-items:flex-start;gap:14px}
+  .avatar.lg{width:58px;height:58px;font-size:22px}
+  .profile-name{font-size:22px;font-weight:800;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .profile-sub{color:var(--text-soft);font-size:14px;margin-top:2px}
+  .profile-note{margin-top:12px;color:var(--text);font-size:14px;background:var(--surface-2);
+    border-radius:var(--radius-sm);padding:10px 12px;white-space:pre-wrap}
+  .summary-row{display:flex;gap:22px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);flex-wrap:wrap}
+  .summary-item .v{font-size:17px;font-weight:700}
+  .summary-item .k{font-size:12px;color:var(--text-faint);margin-top:1px}
+
+  .section{margin-top:22px}
+  .section-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .section-head h2{font-size:15px;font-weight:700;margin:0}
+  .section-head .count{font-size:12px;color:var(--text-faint);background:var(--surface-2);
+    border-radius:999px;padding:1px 8px}
+  .section-head .spacer{margin-left:auto}
+
+  /* ===== Open action items (highlight) ===== */
+  .open-actions{background:var(--att-soft);border:1px solid #f0cfc4;border-radius:var(--radius);padding:6px 14px}
+  .action-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f0d6cc}
+  .action-row:last-child{border-bottom:none}
+  .action-check{width:19px;height:19px;flex:none;margin-top:1px;accent-color:var(--pos);cursor:pointer}
+  .action-body{flex:1;min-width:0}
+  .action-content{font-size:14px}
+  .action-meta{font-size:12px;color:var(--text-soft);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+  .due{font-weight:600}
+  .due.over{color:var(--att)}
+  .due.soon{color:var(--warn)}
+  .action-row.done .action-content{text-decoration:line-through;color:var(--text-faint)}
+
+  /* ===== Timeline ===== */
+  .timeline{display:flex;flex-direction:column;gap:10px}
+  .tl-card{display:block;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--line-strong);
+    border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:13px 15px;cursor:pointer}
+  .tl-card:hover{border-color:var(--brand);border-left-color:var(--brand)}
+  .tl-card.pos{border-left-color:var(--pos)} .tl-card.neu{border-left-color:var(--neu)} .tl-card.att{border-left-color:var(--att)}
+  .tl-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tl-type{font-weight:700;font-size:14px}
+  .tl-date{font-size:12.5px;color:var(--text-faint)}
+  .tl-format{font-size:11.5px;color:var(--text-soft);background:var(--surface-2);border-radius:999px;padding:1px 8px}
+  .tl-summary{font-size:13.5px;color:var(--text-soft);margin-top:6px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tl-foot{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .tl-topics{display:flex;gap:5px;flex-wrap:wrap}
+
+  /* ===== Meeting detail ===== */
+  .mtg-block{margin-bottom:16px}
+  .mtg-block .k{font-size:12px;font-weight:700;color:var(--text-faint);text-transform:none;margin-bottom:4px;letter-spacing:.02em}
+  .mtg-block .v{font-size:14.5px;white-space:pre-wrap;line-height:1.6}
+  .private-note{background:#fff8ec;border:1px dashed var(--warn);border-radius:var(--radius-sm);padding:12px 14px}
+  .private-note .k{color:var(--warn);display:flex;align-items:center;gap:5px}
+  .private-note .v{color:#6b4d18}
+
+  /* ===== Segmented control (mood/format) ===== */
+  .segmented{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--radius-sm);overflow:hidden;flex-wrap:wrap}
+  .segmented label{padding:8px 14px;font-size:13.5px;font-weight:600;color:var(--text-soft);cursor:pointer;
+    border-right:1px solid var(--line);background:var(--surface);user-select:none}
+  .segmented label:last-child{border-right:none}
+  .segmented input{position:absolute;opacity:0;pointer-events:none}
+  .segmented input:checked+span{}
+  .segmented label.on{background:var(--brand-soft);color:var(--brand-ink)}
+  .segmented label.on.pos{background:var(--pos-soft);color:var(--pos)}
+  .segmented label.on.att{background:var(--att-soft);color:var(--att)}
+  .segmented label.on.neu{background:var(--neu-soft);color:var(--neu)}
+
   @media (max-width:560px){
     .seed-grid{grid-template-columns:1fr 1fr}
     .brand span.full{display:none}
     .member-grid{grid-template-columns:1fr}
     .field-row{flex-direction:column;gap:0}
     .form{padding:16px}
+    .summary-row{gap:16px}
   }
 </style>
 </head>
@@ -367,6 +436,36 @@
     if (n===1) return "어제";
     return n+"일 전";
   }
+  function fmtDateTime(iso){
+    if (!iso) return "";
+    var x = new Date(iso);
+    var h = x.getHours(), ap = h<12?"오전":"오후", h12 = h%12; if(h12===0) h12=12;
+    var mm = ("0"+x.getMinutes()).slice(-2);
+    return fmtDate(iso)+" "+ap+" "+h12+":"+mm;
+  }
+  // ISO -> datetime-local 입력값 (로컬 기준)
+  function toLocalInput(iso){
+    var x = iso? new Date(iso) : new Date();
+    var p = function(n){return ("0"+n).slice(-2);};
+    return x.getFullYear()+"-"+p(x.getMonth()+1)+"-"+p(x.getDate())+"T"+p(x.getHours())+":"+p(x.getMinutes());
+  }
+  function fromLocalInput(val){
+    if (!val) return nowISO();
+    var d = new Date(val);
+    return isNaN(d.getTime()) ? nowISO() : d.toISOString();
+  }
+  // 마감일 상태(지남/임박/여유)
+  function dueStatus(dueDate){
+    if (!dueDate) return null;
+    var today = new Date(); today.setHours(0,0,0,0);
+    var due = new Date(dueDate); due.setHours(0,0,0,0);
+    var diff = Math.round((due-today)/86400000);
+    if (diff<0) return {cls:"over", text:(-diff)+"일 지남"};
+    if (diff===0) return {cls:"soon", text:"오늘 마감"};
+    if (diff<=3) return {cls:"soon", text:diff+"일 남음"};
+    return {cls:"", text:"~"+fmtDate(dueDate)};
+  }
+
   var MOOD = {
     positive:{label:"긍정", cls:"pos", icon:"🙂"},
     neutral :{label:"중립", cls:"neu", icon:"😐"},
@@ -638,22 +737,289 @@
     if (Store.save(d)) navigate("#/member/"+targetId);
   }
 
-  /* ---------- 구성원 상세 (3단계에서 완성 — 현재 임시) ---------- */
-  function viewMemberDetailStub(app, params){
+  /* ---------- 구성원 상세 (타임라인) — 제품의 심장 ---------- */
+  function viewMemberDetail(app, params){
     var d = Store.load();
     var id = params[0];
     var m = d.members.filter(function(x){return x.id===id;})[0];
     if (!m){ app.innerHTML = viewNotFound("구성원 "+id); return; }
-    var cnt = Compute.meetingCount(d, m.id);
-    app.innerHTML =
+
+    var meetings = Compute.meetingsOf(d, m.id);     // 최신순
+    var last = meetings[0] || null;
+    var openActions = Compute.openActionsOf(d, m.id)
+      .sort(function(a,b){ // 마감일 이른/지난 것 먼저, 없으면 뒤로
+        var ta = a.dueDate? new Date(a.dueDate).getTime() : Infinity;
+        var tb = b.dueDate? new Date(b.dueDate).getTime() : Infinity;
+        return ta-tb;
+      });
+
+    var tags = (m.tags||[]).map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join(" ");
+
+    var html =
       '<div class="breadcrumb"><a href="#/members">구성원</a> › '+esc(m.name)+'</div>'+
-      '<div class="toolbar"><h1 class="page-title">'+esc(m.name)+'</h1>'+
+      // ----- 프로필 -----
+      '<div class="profile">'+
+        '<div class="profile-head">'+
+          '<div class="avatar lg">'+esc(initials(m.name))+'</div>'+
+          '<div style="flex:1;min-width:0">'+
+            '<div class="profile-name">'+esc(m.name)+
+              (m.status==="inactive"?' <span class="pill-off">퇴사</span>':'')+
+              (last?' '+moodBadge(last.mood):'')+'</div>'+
+            '<div class="profile-sub">'+esc(m.position||"")+(m.team?' · '+esc(m.team):'')+
+              (m.joinDate?' · 합류 '+esc(m.joinDate):'')+'</div>'+
+            (tags?'<div class="tags">'+tags+'</div>':'')+
+          '</div>'+
+          '<a class="btn small" href="#/member/'+esc(m.id)+'/edit">수정</a>'+
+        '</div>'+
+        (m.note?'<div class="profile-note">'+esc(m.note)+'</div>':'')+
+        '<div class="summary-row">'+
+          '<div class="summary-item"><div class="v">'+(last?esc(relDays(last.date)):'없음')+'</div><div class="k">마지막 면담</div></div>'+
+          '<div class="summary-item"><div class="v">'+meetings.length+'회</div><div class="k">누적 면담</div></div>'+
+          '<div class="summary-item"><div class="v">'+(last?MOOD[last.mood].icon+' '+MOOD[last.mood].label:'-')+'</div><div class="k">최근 분위기</div></div>'+
+        '</div>'+
+      '</div>'+
+
+      // ----- 미완료 액션 아이템 -----
+      '<div class="section">'+
+        '<div class="section-head"><h2>미완료 액션 아이템</h2>'+
+          (openActions.length?'<span class="count">'+openActions.length+'</span>':'')+'</div>'+
+        (openActions.length
+          ? '<div class="open-actions">'+openActions.map(function(a){return actionRow(a);}).join("")+'</div>'
+          : '<div class="muted" style="font-size:13px;padding:4px 2px">미완료 액션 아이템이 없습니다. 👍</div>')+
+      '</div>'+
+
+      // ----- 면담 타임라인 -----
+      '<div class="section">'+
+        '<div class="section-head"><h2>면담 타임라인</h2>'+
+          '<span class="count">'+meetings.length+'</span>'+
+          '<div class="spacer"></div>'+
+          '<a class="btn primary small" href="#/member/'+esc(m.id)+'/meeting/new">+ 면담 기록</a>'+
+        '</div>'+
+        (meetings.length
+          ? '<div class="timeline">'+meetings.map(function(mt){return timelineCard(d, mt);}).join("")+'</div>'
+          : '<div class="empty"><div class="big">📝</div>아직 면담 기록이 없습니다.<br>'+
+            '<span class="muted">첫 면담을 기록해 보세요.</span><br><br>'+
+            '<a class="btn primary" href="#/member/'+esc(m.id)+'/meeting/new">+ 면담 기록</a></div>')+
+      '</div>';
+
+    app.innerHTML = html;
+    bindActionChecks(app);
+  }
+
+  function actionRow(a){
+    var ds = dueStatus(a.dueDate);
+    var who = a.assignee==="member" ? "구성원" : "리더";
+    return '<div class="action-row'+(a.status==="done"?" done":"")+'" data-action="'+esc(a.id)+'">'+
+      '<input type="checkbox" class="action-check"'+(a.status==="done"?" checked":"")+' data-action-check="'+esc(a.id)+'" />'+
+      '<div class="action-body">'+
+        '<div class="action-content">'+esc(a.content)+'</div>'+
+        '<div class="action-meta">'+
+          '<span>담당: '+who+'</span>'+
+          (ds?'<span class="due '+ds.cls+'">'+esc(ds.text)+'</span>':'')+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  // 액션 체크박스 → 완료/미완료 토글 (저장)
+  function bindActionChecks(scope){
+    var boxes = scope.querySelectorAll("[data-action-check]");
+    boxes.forEach(function(box){
+      box.addEventListener("change", function(){
+        var aid = box.getAttribute("data-action-check");
+        var d = Store.load();
+        var a = d.actionItems.filter(function(x){return x.id===aid;})[0];
+        if (!a) return;
+        a.status = box.checked ? "done" : "todo";
+        a.completedAt = box.checked ? nowISO() : null;
+        if (Store.save(d)) render();
+      });
+    });
+  }
+
+  function timelineCard(d, mt){
+    var mood = MOOD[mt.mood] || MOOD.neutral;
+    var topics = (mt.topics||[]).slice(0,4).map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join(" ");
+    var openCnt = d.actionItems.filter(function(a){return a.meetingId===mt.id && a.status==="todo";}).length;
+    return '<a class="tl-card '+mood.cls+'" href="#/meeting/'+esc(mt.id)+'">'+
+      '<div class="tl-top">'+
+        '<span class="tl-type">'+esc(mt.type||"면담")+'</span>'+
+        (mt.format?'<span class="tl-format">'+esc(mt.format)+'</span>':'')+
+        moodBadge(mt.mood)+
+        '<span class="spacer" style="margin-left:auto"></span>'+
+        '<span class="tl-date">'+esc(fmtDate(mt.date))+'</span>'+
+      '</div>'+
+      (mt.summary?'<div class="tl-summary">'+esc(mt.summary)+'</div>':'')+
+      ((topics||openCnt)?'<div class="tl-foot">'+
+        (topics?'<div class="tl-topics">'+topics+'</div>':'')+
+        (openCnt?'<span class="badge att" style="margin-left:auto">미완료 액션 '+openCnt+'</span>':'')+
+      '</div>':'')+
+    '</a>';
+  }
+
+  /* ---------- 면담 작성/수정 폼 ---------- */
+  function viewMeetingForm(app, params){
+    var d = Store.load();
+    // 라우트: /member/:mid/meeting/new  또는  /meeting/:id/edit
+    var isNew = location.hash.indexOf("/meeting/new") >= 0;
+    var mtg=null, member=null;
+    if (isNew){
+      member = d.members.filter(function(x){return x.id===params[0];})[0];
+      if (!member){ app.innerHTML = viewNotFound("구성원"); return; }
+    } else {
+      mtg = d.meetings.filter(function(x){return x.id===params[0];})[0];
+      if (!mtg){ app.innerHTML = viewNotFound("면담 "+params[0]); return; }
+      member = d.members.filter(function(x){return x.id===mtg.memberId;})[0];
+    }
+
+    var v = mtg || { date:nowISO(), type:(d.settings.meetingTypes[0]||"정기"), format:"대면",
+                     topics:[], summary:"", memberVoice:"", leaderFeedback:"", mood:"neutral", privateNote:"" };
+
+    var typeOptions = d.settings.meetingTypes.map(function(t){return '<option value="'+esc(t)+'"></option>';}).join("");
+
+    app.innerHTML =
+      '<div class="breadcrumb"><a href="#/member/'+esc(member.id)+'">'+esc(member.name)+'</a> › '+(isNew?'새 면담':'면담 수정')+'</div>'+
+      '<h1 class="page-title">'+(isNew?esc(member.name)+'님 면담 기록':'면담 수정')+'</h1>'+
+      '<form class="form" id="meeting-form" autocomplete="off">'+
+        '<div class="field-row">'+
+          '<div class="field"><label>일시 <span class="req">*</span></label>'+
+            '<input class="input" type="datetime-local" name="date" value="'+esc(toLocalInput(v.date))+'" /></div>'+
+          '<div class="field"><label>면담 유형 <span class="hint">(선택 또는 직접 입력)</span></label>'+
+            '<input class="input" name="type" list="type-list" value="'+esc(v.type)+'" placeholder="정기" />'+
+            '<datalist id="type-list">'+typeOptions+'</datalist></div>'+
+        '</div>'+
+        '<div class="field"><label>형태</label>'+ segmented("format", ["대면","화상","전화"], v.format) +'</div>'+
+        '<div class="field"><label>안건/주제 <span class="hint">(쉼표로 구분, 여러 개)</span></label>'+
+          '<input class="input" name="topics" value="'+esc((v.topics||[]).join(", "))+'" placeholder="예: 분기 목표 점검, 경력 방향" /></div>'+
+        '<div class="field"><label>면담 요약 <span class="req">*</span></label>'+
+          '<textarea class="textarea" name="summary" placeholder="이번 면담의 핵심 내용을 한 단락으로">'+esc(v.summary)+'</textarea></div>'+
+        '<div class="field"><label>구성원 발언 <span class="hint">(선택)</span></label>'+
+          '<textarea class="textarea" name="memberVoice" placeholder="구성원이 직접 한 말">'+esc(v.memberVoice||"")+'</textarea></div>'+
+        '<div class="field"><label>리더 피드백/코칭 <span class="hint">(선택)</span></label>'+
+          '<textarea class="textarea" name="leaderFeedback" placeholder="내가 전한 피드백·코칭">'+esc(v.leaderFeedback||"")+'</textarea></div>'+
+        '<div class="field"><label>분위기</label>'+ moodSegmented(v.mood) +'</div>'+
+        '<div class="field"><label>🔒 비공개 메모 <span class="hint">(나만 보는 메모)</span></label>'+
+          '<textarea class="textarea" name="privateNote" placeholder="구성원에게 공유하지 않는 개인 메모" style="background:#fff8ec">'+esc(v.privateNote||"")+'</textarea></div>'+
+        '<div class="err" id="form-err"></div>'+
+        '<div class="form-actions">'+
+          (isNew?'':'<button type="button" class="btn danger small" id="btn-del-meeting">삭제</button>')+
+          '<div class="spacer"></div>'+
+          '<a class="btn ghost" href="'+(isNew?'#/member/'+esc(member.id):'#/meeting/'+esc(v.id))+'">취소</a>'+
+          '<button type="submit" class="btn primary">저장</button>'+
+        '</div>'+
+      '</form>';
+
+    var form = document.getElementById("meeting-form");
+    bindSegmented(form);
+    form.addEventListener("submit", function(e){ e.preventDefault(); saveMeetingFromForm(form, mtg, member); });
+    var del = document.getElementById("btn-del-meeting");
+    if (del) del.addEventListener("click", function(){ deleteMeeting(mtg); });
+  }
+
+  // 세그먼트 컨트롤 생성 (라디오 기반)
+  function segmented(name, options, current){
+    return '<div class="segmented" data-seg="'+name+'">'+ options.map(function(o){
+      var on = (o===current);
+      return '<label class="'+(on?"on":"")+'"><input type="radio" name="'+name+'" value="'+esc(o)+'"'+(on?" checked":"")+' />'+esc(o)+'</label>';
+    }).join("") +'</div>';
+  }
+  function moodSegmented(current){
+    var opts=[["positive","🙂 긍정","pos"],["neutral","😐 중립","neu"],["attention","⚠️ 주의 필요","att"]];
+    return '<div class="segmented" data-seg="mood">'+ opts.map(function(o){
+      var on=(o[0]===current);
+      return '<label class="'+o[2]+(on?" on":"")+'"><input type="radio" name="mood" value="'+o[0]+'"'+(on?" checked":"")+' />'+o[1]+'</label>';
+    }).join("") +'</div>';
+  }
+  function bindSegmented(form){
+    form.querySelectorAll(".segmented").forEach(function(seg){
+      seg.querySelectorAll("input[type=radio]").forEach(function(r){
+        r.addEventListener("change", function(){
+          seg.querySelectorAll("label").forEach(function(l){ l.classList.remove("on"); });
+          r.parentNode.classList.add("on");
+        });
+      });
+    });
+  }
+
+  function saveMeetingFromForm(form, existing, member){
+    var d = Store.load();
+    var errEl = document.getElementById("form-err");
+    var summary = form.elements["summary"].value.trim();
+    var type = form.elements["type"].value.trim() || "수시";
+    if (!summary){ errEl.textContent = "면담 요약은 필수입니다."; form.elements["summary"].focus(); return; }
+
+    var topics = form.elements["topics"].value.split(",").map(function(t){return t.trim();}).filter(Boolean);
+    var moodEl = form.querySelector("input[name=mood]:checked");
+    var formatEl = form.querySelector("input[name=format]:checked");
+    var fields = {
+      date: fromLocalInput(form.elements["date"].value),
+      type: type,
+      format: formatEl ? formatEl.value : "대면",
+      topics: topics,
+      summary: summary,
+      memberVoice: form.elements["memberVoice"].value.trim(),
+      leaderFeedback: form.elements["leaderFeedback"].value.trim(),
+      mood: moodEl ? moodEl.value : "neutral",
+      privateNote: form.elements["privateNote"].value.trim()
+    };
+
+    var targetId;
+    if (existing){
+      var ref = d.meetings.filter(function(x){return x.id===existing.id;})[0];
+      Object.assign(ref, fields, { updatedAt:nowISO() });
+      targetId = ref.id;
+    } else {
+      var mt = Object.assign({ id:uuid(), memberId:member.id }, fields, { createdAt:nowISO(), updatedAt:nowISO() });
+      d.meetings.push(mt);
+      targetId = mt.id;
+    }
+    if (Store.save(d)) navigate("#/meeting/"+targetId);
+  }
+
+  function deleteMeeting(mtg){
+    if (!mtg) return;
+    var d = Store.load();
+    var linked = d.actionItems.filter(function(a){return a.meetingId===mtg.id;}).length;
+    var msg = "이 면담 기록을 삭제할까요?";
+    if (linked) msg += "\n연결된 액션 아이템 "+linked+"건도 함께 삭제됩니다.";
+    msg += "\n이 작업은 되돌릴 수 없습니다.";
+    if (!confirm(msg)) return;
+    var memberId = mtg.memberId;
+    d.meetings = d.meetings.filter(function(x){return x.id!==mtg.id;});
+    d.actionItems = d.actionItems.filter(function(a){return a.meetingId!==mtg.id;});
+    if (Store.save(d)) navigate("#/member/"+memberId);
+  }
+
+  /* ---------- 면담 상세 ---------- */
+  function viewMeetingDetail(app, params){
+    var d = Store.load();
+    var mt = d.meetings.filter(function(x){return x.id===params[0];})[0];
+    if (!mt){ app.innerHTML = viewNotFound("면담 "+params[0]); return; }
+    var member = d.members.filter(function(x){return x.id===mt.memberId;})[0] || {name:"(삭제된 구성원)", id:mt.memberId};
+    var topics = (mt.topics||[]).map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join(" ");
+
+    function block(k,v){ return v ? '<div class="mtg-block"><div class="k">'+k+'</div><div class="v">'+esc(v)+'</div></div>' : ""; }
+
+    app.innerHTML =
+      '<div class="breadcrumb"><a href="#/members">구성원</a> › <a href="#/member/'+esc(member.id)+'">'+esc(member.name)+'</a> › 면담</div>'+
+      '<div class="toolbar">'+
+        '<h1 class="page-title">'+esc(mt.type||"면담")+' 면담</h1>'+
         '<div class="spacer"></div>'+
-        '<a class="btn small" href="#/member/'+esc(m.id)+'/edit">수정</a></div>'+
-      '<div class="card" style="padding:18px">'+
-        '<div class="mc-sub">'+esc(m.position||"")+(m.team?' · '+esc(m.team):'')+'</div>'+
-        '<p class="muted" style="margin-top:10px">구성원 상세(프로필·미완료 액션·면담 타임라인)와 면담 작성은 '+
-        '<b>3단계</b>에서 완성됩니다. 현재 누적 면담 '+cnt+'회.</p>'+
+        '<a class="btn small" href="#/meeting/'+esc(mt.id)+'/edit">수정</a>'+
+      '</div>'+
+      '<div class="card" style="padding:20px">'+
+        '<div class="tl-top" style="margin-bottom:14px">'+
+          '<span class="tl-date">'+esc(fmtDateTime(mt.date))+'</span>'+
+          (mt.format?'<span class="tl-format">'+esc(mt.format)+'</span>':'')+
+          moodBadge(mt.mood)+
+        '</div>'+
+        (topics?'<div class="mtg-block"><div class="k">안건/주제</div><div class="tags">'+topics+'</div></div>':"")+
+        block("면담 요약", mt.summary)+
+        block("구성원 발언", mt.memberVoice)+
+        block("리더 피드백/코칭", mt.leaderFeedback)+
+        (mt.privateNote
+          ? '<div class="private-note"><div class="k">🔒 비공개 메모 (나만 봄)</div><div class="v">'+esc(mt.privateNote)+'</div></div>'
+          : "")+
       '</div>';
   }
 
@@ -683,7 +1049,10 @@
   route(/^\/members$/, viewMembers);
   route(/^\/member\/new$/, viewMemberForm);
   route(/^\/member\/([^\/]+)\/edit$/, viewMemberForm);
-  route(/^\/member\/([^\/]+)$/, viewMemberDetailStub);
+  route(/^\/member\/([^\/]+)\/meeting\/new$/, viewMeetingForm);
+  route(/^\/member\/([^\/]+)$/, viewMemberDetail);
+  route(/^\/meeting\/([^\/]+)\/edit$/, viewMeetingForm);
+  route(/^\/meeting\/([^\/]+)$/, viewMeetingDetail);
   route(/^\/settings$/, viewSettingsStub);
 
   /* ---------- 부트 ---------- */
