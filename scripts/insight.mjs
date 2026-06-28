@@ -59,7 +59,13 @@ export async function addInsights(items) {
   const url = `${ENDPOINT}/v1beta/models/${model}:generateContent`;
   const body = {
     contents: [{ parts: [{ text: buildPrompt(items) }] }],
-    generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
+    generationConfig: {
+      temperature: 0.4,
+      // 기사 수가 많으면 2048로는 JSON이 잘려 파싱 실패 → 넉넉히.
+      maxOutputTokens: 8192,
+      // JSON 모드: 코드펜스·군더더기 없이 순수 JSON만 반환 → 파싱 안정.
+      responseMimeType: "application/json",
+    },
   };
 
   let data;
@@ -83,10 +89,15 @@ export async function addInsights(items) {
     return 0;
   }
 
-  const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
+  const cand = data?.candidates?.[0];
+  const text = cand?.content?.parts?.map((p) => p.text || "").join("") || "";
   const arr = extractJson(text);
   if (!Array.isArray(arr)) {
-    console.warn("Gemini 응답 파싱 실패 → 인사이트 건너뜀");
+    // 진단용: 잘림(MAX_TOKENS)·차단(SAFETY) 등 원인을 남김. 키는 출력하지 않음.
+    console.warn(
+      `Gemini 응답 파싱 실패 → 인사이트 건너뜀 (finishReason=${cand?.finishReason || "?"}, ` +
+        `len=${text.length}, head=${JSON.stringify(text.slice(0, 80))})`
+    );
     return 0;
   }
 
